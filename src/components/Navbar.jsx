@@ -50,7 +50,7 @@ const Navbar = ({
             <div className="sidebar-header">
                 <div className="brand">
                     <span className="brand-mark">
-                        <img src={logo} alt="" />
+                        <img src={logo} alt="A logo for the company cohort 51" />
                     </span>
                     <span className="brand-name">
                         Cohort<span className="brand-accent">51</span>
@@ -67,7 +67,7 @@ const Navbar = ({
                 </button>
             </div>
 
-            <p className="section-label">Workspace</p>
+            {/* <p className="section-label">Workspace</p> */}
 
             <nav aria-label="Main">
                 <ul className="nav">
