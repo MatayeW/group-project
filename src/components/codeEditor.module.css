@@ -1,0 +1,829 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+/* Everything in this file is scoped to the CodeEditor component.
+   Vite turns each class name into a unique one, so these names
+   can't clash with the Navbar or any other page. */
+
+/* ---------- THEME COLOURS ----------
+   The light colours live on .codeEditor. The dark colours are the same
+   variable names with new values, and they apply when the component has
+   data-theme="dark". To change a colour in one theme, change it here only.
+   The code panel (editor, tests, buttons) is dark in both themes. */
+.codeEditor {
+  --page-bg: #f4f4f8;
+  --text: #26253a;
+  --toolbar-bg: #ffffff;
+  --pane-bg: #ffffff;
+  --line: #e3e2ea;
+  --line-soft: #ebeaf0;
+  --muted: #8f8ca0;
+  --strong: #363448;
+  --heading: #252337;
+  --copy: #545160;
+  --copy-soft: #696674;
+  --tab: #8c8999;
+  --tab-active: #4d466f;
+  --control-border: #e3e1ea;
+  --control-text: #656276;
+  --control-bg: #ffffff;
+  --control-hover-border: #bdb8df;
+  --control-hover-text: #5d54b2;
+  --toggle-text: #656276;
+  --running-border: #c8c3ec;
+  --running-text: #675dc8;
+  --running-bg: #f5f3ff;
+  --total-xp-border: #dcd9fa;
+  --total-xp-text: #6359bc;
+  --total-xp-bg: #eeecff;
+  --chip-text: #716e7e;
+  --chip-bg: #f2f1f5;
+  --level-text: #6359bc;
+  --level-bg: #eeecff;
+  --xp-border: #d2cbf8;
+  --xp-bg: #ffffff;
+  --code-text: #5f55b6;
+  --code-bg: #f1effd;
+  --example-border: #e9e7ee;
+  --example-text: #5c5967;
+  --example-bg: #f8f8fa;
+  --example-label: #7b71d2;
+  --hint-border: #e7e3c9;
+  --hint-bg: #fdfbf2;
+  --hint-strong: #6c613d;
+  --hint-text: #8a805e;
+  --hint-button: #7b6d3e;
+  --pass-text: #6d61d7;
+  --fail-text: #c94f70;
+  --divider: #bdb8d6;
+}
+
+.codeEditor[data-theme="dark"] {
+  --page-bg: #11111c;
+  --text: #d8d5e2;
+  --toolbar-bg: #191824;
+  --pane-bg: #1b1a2a;
+  --line: #302e40;
+  --line-soft: #343244;
+  --muted: #9692a3;
+  --strong: #e0dde9;
+  --heading: #f0eef7;
+  --copy: #bab6c5;
+  --copy-soft: #aaa6b5;
+  --tab: #8c8899;
+  --tab-active: #c7c1ff;
+  --control-border: #3a384a;
+  --control-text: #aaa6b7;
+  --control-bg: #242334;
+  --control-hover-border: #6f67b8;
+  --control-hover-text: #c2bcff;
+  --toggle-text: #b9b1ff;
+  --running-border: #615a9e;
+  --running-text: #c0b9ff;
+  --running-bg: #2c2945;
+  --total-xp-border: #615a9e;
+  --total-xp-text: #c0b9ff;
+  --total-xp-bg: #2c2945;
+  --chip-text: #aaa6b5;
+  --chip-bg: #2a2839;
+  --level-text: #b8b0ff;
+  --level-bg: #302d4c;
+  --xp-border: #4d497d;
+  --xp-bg: #1b1a2a;
+  --code-text: #bcb4ff;
+  --code-bg: #2d2a46;
+  --example-border: #353345;
+  --example-text: #c6c2cf;
+  --example-bg: #222130;
+  --example-label: #9f96f2;
+  --hint-border: #504933;
+  --hint-bg: #2c291f;
+  --hint-strong: #e2cd84;
+  --hint-text: #b2a573;
+  --hint-button: #d4bd6e;
+  --pass-text: #a79cff;
+  --fail-text: #f06ba5;
+  --divider: #46435e;
+}
+
+/* the whole page area to the right of the Navbar */
+.codeEditor {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: 13px;
+}
+
+/* keep this first, so the rules below can set their own font size */
+.codeEditor button {
+  font: inherit;
+  cursor: pointer;
+}
+
+/* toolbar */
+.toolbar {
+  min-height: 56px;
+  flex: 0 0 auto;
+  padding: 0 22px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--toolbar-bg);
+}
+
+.breadcrumb {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.breadcrumb strong {
+  overflow: hidden;
+  color: var(--strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.problemCounter {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.problemCounter strong {
+  color: var(--strong);
+}
+
+.problemCounter button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--control-border);
+  border-radius: 6px;
+  color: var(--control-text);
+  background: var(--control-bg);
+}
+
+.problemCounter button:hover:not(:disabled) {
+  border-color: var(--control-hover-border);
+  color: var(--control-hover-text);
+}
+
+.problemCounter button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.timerControl {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.totalXp {
+  margin-right: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--total-xp-border);
+  border-radius: 999px;
+  color: var(--total-xp-text);
+  background: var(--total-xp-bg);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.timerControl label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--control-text);
+  font-weight: 600;
+}
+
+.timerControl input {
+  width: 14px;
+  height: 14px;
+  accent-color: #766ae0;
+}
+
+.timerValue {
+  min-width: 56px;
+  padding: 7px 10px;
+  border: 1px solid var(--control-border);
+  border-radius: 6px;
+  color: var(--control-text);
+  background: var(--control-bg);
+  font-family: "DM Mono", monospace;
+  text-align: center;
+}
+
+.isRunning {
+  border-color: var(--running-border);
+  color: var(--running-text);
+  background: var(--running-bg);
+}
+
+.timerButton,
+.timerReset {
+  padding: 7px 11px;
+  border: 0;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.timerButton {
+  color: #fff;
+  background: #34315f;
+}
+
+.timerReset {
+  color: var(--control-text);
+  background: transparent;
+}
+
+/* the round light / dark mode button */
+.themeToggle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-left: 6px;
+  border: 1px solid var(--control-border);
+  border-radius: 50%;
+  color: var(--toggle-text);
+  background: var(--control-bg);
+}
+
+.themeToggle:hover {
+  border-color: var(--control-hover-border);
+  color: var(--control-hover-text);
+}
+
+/* workspace: question pane | divider | editor pane */
+.workspace {
+  flex: 1;
+  min-height: 0;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 45fr) 12px minmax(0, 55fr);
+  grid-template-rows: minmax(0, 1fr);
+  column-gap: 0;
+}
+
+/* left: question pane */
+.questionPane {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--pane-bg);
+}
+
+.questionTabs {
+  flex: 0 0 auto;
+  height: 46px;
+  padding: 0 22px;
+  display: flex;
+  gap: 22px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.questionTabs button {
+  position: relative;
+  border: 0;
+  color: var(--tab);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.questionTabs button.active {
+  color: var(--tab-active);
+}
+
+.questionTabs button.active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: #7c6ee6;
+}
+
+.questionScroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 30px 34px;
+}
+
+.questionNumber {
+  color: #8a82d8;
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.7px;
+}
+
+.questionScroll h1 {
+  margin-top: 7px;
+  color: var(--heading);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+}
+
+.classification {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 17px 0 25px;
+}
+
+.classification span {
+  padding: 5px 9px;
+  border-radius: 5px;
+  color: var(--chip-text);
+  background: var(--chip-bg);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.classification .level {
+  color: var(--level-text);
+  background: var(--level-bg);
+}
+
+.classification .xpChip {
+  border: 1px solid var(--xp-border);
+  color: var(--level-text);
+  background: var(--xp-bg);
+  font-weight: 700;
+}
+
+.problemCopy {
+  color: var(--copy);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.problemCopy p {
+  margin-bottom: 24px;
+}
+
+.problemCopy code {
+  padding: 2px 5px;
+  border-radius: 3px;
+  color: var(--code-text);
+  background: var(--code-bg);
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+}
+
+.problemCopy h2 {
+  margin: 24px 0 9px;
+  color: var(--heading);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.exampleBox {
+  overflow-x: auto;
+  padding: 14px 15px;
+  border: 1px solid var(--example-border);
+  border-radius: 7px;
+  color: var(--example-text);
+  background: var(--example-bg);
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.exampleBox span {
+  color: var(--example-label);
+}
+
+.problemCopy ul {
+  padding-left: 18px;
+  color: var(--copy-soft);
+}
+
+.problemCopy li {
+  margin: 5px 0;
+}
+
+.hintBox {
+  margin-top: 28px;
+  padding: 15px;
+  border: 1px solid var(--hint-border);
+  border-radius: 7px;
+  background: var(--hint-bg);
+}
+
+.hintBox strong {
+  color: var(--hint-strong);
+  font-size: 13px;
+}
+
+.hintBox p {
+  margin: 4px 0 8px;
+  color: var(--hint-text);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.hintBox button {
+  padding: 0;
+  border: 0;
+  color: var(--hint-button);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.emptySubmissions {
+  padding-top: 60px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.emptySubmissions h2 {
+  margin-bottom: 4px;
+  color: var(--heading);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.emptySubmissions p {
+  font-size: 12px;
+}
+
+.submissionList {
+  list-style: none;
+}
+
+.submissionList li {
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.pass {
+  color: var(--pass-text);
+}
+
+.fail {
+  color: var(--fail-text);
+}
+
+.when {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* the bar between the question pane and the editor pane (drag left or right) */
+.sideDivider {
+  position: relative;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.sideDivider::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 6px;
+  border-radius: 6px;
+  background: var(--divider);
+  transform: translateX(-50%);
+}
+
+.sideDivider:hover::after,
+.draggingSide .sideDivider::after {
+  background: #a79cff;
+}
+
+/* right: editor pane (top bar, code, divider, tests, buttons).
+   This whole panel is dark in both themes. */
+.editorPane {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 45px minmax(120px, 1fr) 10px 250px 56px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #202033;
+}
+
+/* nothing inside the editor pane may force it wider than the pane */
+.editorPane > * {
+  min-width: 0;
+}
+
+.editorTopbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px 0 0;
+  border-bottom: 1px solid #37364a;
+  color: #b9b7c7;
+  background: #29283b;
+  font-size: 12px;
+}
+
+.fileTab {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-right: 1px solid #3a394c;
+  background: #202033;
+  font-family: "DM Mono", monospace;
+}
+
+.fileTab span {
+  color: #e0c85e;
+  font-weight: 500;
+}
+
+.editorTopbar select {
+  padding: 6px 10px;
+  border: 1px solid #47465a;
+  border-radius: 5px;
+  outline: 0;
+  color: #c4c2ce;
+  background: #323145;
+  font-size: 11px;
+}
+
+.editorArea {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* the bar between the code and the test cases (drag up or down) */
+.testsDivider {
+  position: relative;
+  cursor: row-resize;
+  touch-action: none;
+  border-top: 1px solid #37364a;
+  background: #29283b;
+}
+
+.testsDivider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 4px;
+  border-radius: 4px;
+  background: #5f5d71;
+  transform: translate(-50%, -50%);
+}
+
+.testsDivider:hover::after,
+.draggingTests .testsDivider::after {
+  background: #a79cff;
+}
+
+/* tests + console */
+.testPanel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #37364a;
+  color: #b8b6c5;
+  background: #262538;
+}
+
+.testHeading {
+  flex: 0 0 auto;
+  height: 40px;
+  padding: 0 14px;
+  display: flex;
+  gap: 16px;
+  border-bottom: 1px solid #37364a;
+}
+
+.testHeading button {
+  border: 0;
+  color: #757386;
+  background: transparent;
+  font-size: 12px;
+}
+
+.testHeading button.active {
+  color: #e0deea;
+}
+
+.testBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.testTabs {
+  display: flex;
+  gap: 5px;
+  padding: 12px 14px 8px;
+}
+
+.testTabs button {
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 4px;
+  color: #7f7d8e;
+  background: transparent;
+  font-size: 11px;
+}
+
+.testTabs button.active {
+  color: #d5d2e3;
+  background: #3a384f;
+}
+
+.testValues {
+  display: grid;
+  grid-template-columns: 1fr 0.6fr 0.6fr;
+  gap: 8px;
+  padding: 0 14px 10px;
+}
+
+.testValues > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.testValues span {
+  color: #716f80;
+  font-size: 11px;
+}
+
+.testValues code {
+  overflow: hidden;
+  padding: 9px;
+  border-radius: 4px;
+  color: #c9c7d4;
+  background: #202033;
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.testValues code.outputSuccess {
+  color: #7ed3a9;
+}
+
+.testValues code.outputFail {
+  color: #f06ba5;
+}
+
+.hiddenStatus {
+  padding: 0 14px 12px;
+  color: #8f8ca3;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.consoleLines {
+  padding: 12px 14px;
+  color: #c9c7d4;
+  font-family: "DM Mono", monospace;
+  font-size: 12.5px;
+  line-height: 22px;
+}
+
+/* bottom buttons */
+.editorActions {
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #37364a;
+  background: #29283b;
+}
+
+.editorActions > div {
+  display: flex;
+  gap: 8px;
+}
+
+.editorActions button {
+  padding: 9px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.resetCode {
+  border: 0;
+  color: #898698;
+  background: transparent;
+}
+
+.resetCode:hover {
+  color: #d4d1dd;
+}
+
+.runButton {
+  border: 1px solid #555268;
+  color: #d4d1dd;
+  background: #343247;
+}
+
+.runButton:hover {
+  border-color: #7c6ee6;
+}
+
+.submitButton {
+  border: 0;
+  color: #242038;
+  background: #a79cff;
+}
+
+.submitButton:hover {
+  background: #b9b0ff;
+}
+
+/* while dragging: keep the cursor, don't select text, stop the editor catching the mouse */
+.draggingSide,
+.draggingSide * {
+  cursor: col-resize !important;
+  user-select: none;
+}
+
+.draggingTests,
+.draggingTests * {
+  cursor: row-resize !important;
+  user-select: none;
+}
+
+.draggingSide .editorArea,
+.draggingTests .editorArea {
+  pointer-events: none;
+}
+
+/* smaller screens: stack the two panes */
+@media (max-width: 900px) {
+  .codeEditor {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr;
+    padding: 10px 16px;
+    gap: 8px;
+  }
+
+  .timerControl {
+    justify-content: flex-start;
+  }
+
+  .workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sideDivider {
+    display: none;
+  }
+
+  .questionPane {
+    min-height: 520px;
+  }
+
+  .editorPane {
+    min-height: 680px;
+  }
+}
