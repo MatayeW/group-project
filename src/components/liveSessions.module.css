@@ -1,0 +1,522 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+/* ---------- root wrapper: variables + scoped resets (replaces index.css) ---------- */
+.app {
+  --bg: #f7f7fb;
+  --surface: #ffffff;
+  --ink: #19192d;
+  --muted: #6a6880;
+  --line: #e5e4ed;
+  --subtle: #f0eff6;
+  --accent: #7c6ee6;
+  --accent-soft: #eeebfd;
+  --accent-line: #d2cbf8;
+  --pass: #6d61d7;
+  --fail: #c94f70;
+  --amber-soft: #fbf0d9;
+  --amber-line: #f0d49b;
+
+  /* in the app's flex row this takes exactly the space left beside the sidebar;
+     in a normal block parent it simply fills the width */
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 100vh;
+  font-family: "Manrope", sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--bg);
+  font-synthesis: none;
+}
+
+/* :where() keeps these at zero extra specificity so the classes below always win */
+.app :where(button) {
+  font: inherit;
+  cursor: pointer;
+}
+
+/* beats any global button font-family in the group project */
+.app button {
+  font-family: inherit;
+}
+
+.app :where(h1, h2, h3, p) {
+  margin: 0;
+}
+
+.app :where(*) {
+  scrollbar-width: thin;
+  scrollbar-color: #c9c6d8 transparent;
+}
+
+/* ---------- shared pieces ---------- */
+.card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.cardHeading {
+  padding: 10px 12px 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+
+.cardHeading h2 {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.iconBtn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  background: var(--surface);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.iconBtn:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  background: var(--subtle);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ---------- page ---------- */
+.page {
+  /* fills all the room beside the sidebar, like the code editor page:
+     no centred max-width and a slim side padding */
+  width: 100%;
+  box-sizing: border-box;
+  padding: 28px 20px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* nothing inside the page may force it wider than the space it is given */
+.page > * {
+  min-width: 0;
+}
+
+.page h1 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.liveLayout {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* when the problems list is collapsed it becomes a slim rail */
+.liveLayout.collapsed {
+  grid-template-columns: 52px minmax(0, 1fr);
+}
+
+/* ---------- problems received ---------- */
+.inboxList {
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inboxItem {
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+}
+
+.inboxItem:hover,
+.inboxItem.selected {
+  background: var(--subtle);
+}
+
+.inboxTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.inboxItem.selected .inboxTitle {
+  font-weight: 700;
+}
+
+.check {
+  color: var(--pass);
+  font-weight: 800;
+}
+
+.inboxMeta {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* the collapsed rail: an expand button and one small button per problem */
+.rail {
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.railItem {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.railItem:hover,
+.railItem.selected {
+  color: var(--ink);
+  background: var(--subtle);
+}
+
+/* ---------- selected problem ---------- */
+.work {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.problemCard {
+  padding: 20px;
+}
+
+.problemTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.titleRow h2 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.sentBy {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.clockBox {
+  text-align: right;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.clock {
+  margin-top: 4px;
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid var(--amber-line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--amber-soft);
+  font-family: "DM Mono", monospace;
+  font-size: 20px;
+}
+
+.statement {
+  max-width: 65ch;
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.shareNote {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ---------- editor card: header, code, then the test panel underneath ---------- */
+.editorColumn {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editorCard {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #2f2e45;
+  border-radius: 12px;
+  background: #202033;
+}
+
+.editorHeader {
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #37364a;
+  background: #29283b;
+}
+
+.fileName {
+  padding-left: 4px;
+  color: #b9b7c7;
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+}
+
+.editorActions {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn {
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnRun {
+  border: 1px solid #555268;
+  color: #d4d1dd;
+  background: #343247;
+}
+
+.btnRun:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.btnSubmit {
+  border: 0;
+  color: #242038;
+  background: #a79cff;
+}
+
+.btnSubmit:hover:not(:disabled) {
+  background: #b9b0ff;
+}
+
+/* the editor box can be resized: drag its bottom-right corner */
+.editorBody {
+  height: 340px;
+  min-height: 220px;
+  resize: vertical;
+  overflow: hidden;
+  background: #202033;
+}
+
+/* ---------- test cases + console, under the editor ---------- */
+.testPanel {
+  height: 230px;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #37364a;
+  color: #b8b6c5;
+  background: #262538;
+}
+
+.testHeading {
+  flex: 0 0 auto;
+  height: 40px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #37364a;
+}
+
+.testHeading button {
+  padding: 1px 6px; /* the browser default that the project-wide padding:0 reset removes */
+  border: 0;
+  color: #757386;
+  background: transparent;
+  font-size: 12px;
+}
+
+.testHeading button.active {
+  color: #e0deea;
+}
+
+.testCount {
+  margin-left: auto;
+  color: #8f8ca3;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.testBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.testTabs {
+  display: flex;
+  gap: 5px;
+  padding: 12px 14px 8px;
+}
+
+.testTabs button {
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 4px;
+  color: #7f7d8e;
+  background: transparent;
+  font-size: 11px;
+}
+
+.testTabs button.active {
+  color: #d5d2e3;
+  background: #3a384f;
+}
+
+.testValues {
+  display: grid;
+  grid-template-columns: 1fr 0.6fr 0.6fr;
+  gap: 8px;
+  padding: 0 14px 12px;
+}
+
+.testValues > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.testValues span {
+  color: #716f80;
+  font-size: 11px;
+}
+
+.testValues code {
+  overflow: hidden;
+  padding: 9px;
+  border-radius: 4px;
+  color: #c9c7d4;
+  background: #202033;
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.testValues code.outputSuccess {
+  color: #7ed3a9;
+}
+
+.testValues code.outputFail {
+  color: #f06ba5;
+}
+
+.consoleLines {
+  padding: 12px 14px;
+  color: #c9c7d4;
+  font-family: "DM Mono", monospace;
+  font-size: 12.5px;
+  line-height: 22px;
+}
+
+.statusLine {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.statusLine .pass,
+.pass {
+  color: var(--pass);
+}
+
+/* ---------- smaller screens ---------- */
+@media (max-width: 900px) {
+  .liveLayout,
+  .liveLayout.collapsed {
+    grid-template-columns: 1fr;
+  }
+
+  .rail {
+    padding: 8px 12px;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
