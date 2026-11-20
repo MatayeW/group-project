@@ -1,5 +1,13 @@
+import Navbar from "../../components/Navbar";
+import CodeEditor from "../../components/CodeEditor";
+
 const LearnerCodeEnvironmentPage = () => {
-    return <h1>This is the Learner Code Environment Page</h1>
-}
+    return (
+        <div className="layout">
+            <Navbar />
+            <CodeEditor />
+        </div>
+    );
+};
 
 export default LearnerCodeEnvironmentPage;
