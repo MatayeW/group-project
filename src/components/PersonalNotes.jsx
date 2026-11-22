@@ -1,13 +1,14 @@
 import { useId, useRef, useState } from "react";
+import { FileText, LoaderCircle, Pencil, Trash2 } from "lucide-react";
+import {
+    ACCEPTED_FILES,
+    MAX_FILE_SIZE,
+    extractText,
+} from "../utils/extractText";
 import styles from "./PersonalNotes.module.css";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-const parseISODate = (iso) => {
-    const [year, month, day] = iso.split("-").map(Number);
-    return new Date(year, month - 1, day);
-};
 
 const isSameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
@@ -21,149 +22,276 @@ const TOPICS = [
     "Searching", "Sorting", "Time/Space Complexity", "OOP",
 ];
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const countWords = (text) => (text.trim() ? text.trim().split(/\s+/).length : 0);
 
-const SEED_NOTES = [
-    {
-        id: "seed-1",
-        title: "My loop mistakes",
-        topic: "Loops",
-        fileName: "my-loop-mistakes.pdf",
-        createdAt: parseISODate("2026-11-09"),
-    },
-    {
-        id: "seed-2",
-        title: "String methods summary",
-        topic: "Strings",
-        fileName: "string-methods.docx",
-        createdAt: parseISODate("2026-11-06"),
-    },
-];
-
-const PersonalNotes = () => {
-    const [notes, setNotes] = useState(SEED_NOTES);
+const PersonalNotes = ({ notes, onSave, onDelete }) => {
+    const [tab, setTab] = useState("write"); // "write" or "saved"
+    const [editingId, setEditingId] = useState(null);
     const [title, setTitle] = useState("");
     const [concept, setConcept] = useState("");
-    const [file, setFile] = useState(null);
+    const [body, setBody] = useState("");
+    const [fileName, setFileName] = useState("");
+    const [extracting, setExtracting] = useState(false);
     const [error, setError] = useState("");
-    const fileInputRef = useRef(null);
+    const [expandedId, setExpandedId] = useState(null);
 
-    // useId keeps label/input ids unique even if this component renders twice
+    // counts up each time a file is picked, so an old extraction can't overwrite a newer one
+    const latestRun = useRef(0);
+
     const uid = useId();
     const titleId = `${uid}-title`;
     const conceptId = `${uid}-concept`;
     const fileId = `${uid}-file`;
-    const headingId = `${uid}-heading`;
+    const bodyId = `${uid}-body`;
 
     const resetForm = () => {
+        latestRun.current++;
+        setEditingId(null);
         setTitle("");
         setConcept("");
-        setFile(null);
+        setBody("");
+        setFileName("");
+        setExtracting(false);
         setError("");
-        if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
-    const handleFileChange = (e) => {
-        const picked = e.target.files?.[0] ?? null;
+    // read the picked file and drop its text into the editable box
+    const handleFileChange = async (e) => {
+        const picked = e.target.files?.[0];
+        e.target.value = ""; // lets you pick the same file again later
+        if (!picked) return;
 
-        if (picked && picked.size > MAX_FILE_SIZE) {
+        if (picked.size > MAX_FILE_SIZE) {
             setError("That file is over 5 MB. Choose a smaller one.");
-            setFile(null);
-            e.target.value = "";
             return;
         }
 
+        const run = ++latestRun.current;
         setError("");
-        setFile(picked);
+        setExtracting(true);
+
+        try {
+            const text = await extractText(picked);
+            if (run !== latestRun.current) return;
+
+            if (!text) {
+                setError("No text found in that file. If it's a scan, upload it as an image instead.");
+                return;
+            }
+
+            // keep anything already typed and add the new text underneath
+            setBody((previous) => (previous.trim() ? `${previous.trimEnd()}\n\n${text}` : text));
+            setFileName(picked.name);
+            setTitle((previous) => previous || picked.name.replace(/\.[^.]+$/, ""));
+        } catch (err) {
+            if (run === latestRun.current) {
+                setError(err.message || "Couldn't read that file.");
+            }
+        } finally {
+            if (run === latestRun.current) setExtracting(false);
+        }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (extracting) return;
 
-        if (!title.trim() || !concept || !file) {
-            setError("Add a title, choose a concept and attach a file.");
+        if (!title.trim() || !concept || !body.trim()) {
+            setError("Add a title, choose a concept and write something.");
             return;
         }
 
-        const newNote = {
-            id: crypto.randomUUID(),
+        onSave({
+            id: editingId,
             title: title.trim(),
             topic: concept,
-            fileName: file.name,
-            file,
-            createdAt: new Date(),
-        };
-
-        setNotes((prev) => [newNote, ...prev]);
+            body: body.trim(),
+            fileName,
+        });
         resetForm();
+        setTab("saved");
+    };
+
+    const startEdit = (note) => {
+        latestRun.current++;
+        setEditingId(note.id);
+        setTitle(note.title);
+        setConcept(note.topic);
+        setBody(note.body ?? "");
+        setFileName(note.fileName ?? "");
+        setExtracting(false);
+        setError("");
+        setTab("write");
+    };
+
+    const handleDelete = (note) => {
+        if (!window.confirm(`Delete "${note.title}"?`)) return;
+        onDelete(note.id);
+        if (editingId === note.id) resetForm();
     };
 
     return (
-        <section className={styles.card} aria-labelledby={headingId}>
-            <div className={styles.top}>
-                <h2 id={headingId} className={styles.heading}>My notes</h2>
-                <p className={styles.hint}>Upload your own notes. Only you can see them.</p>
-
-                <form className={styles.form} onSubmit={handleSubmit}>
-                    <div className={styles.field}>
-                        <label className={styles.label} htmlFor={titleId}>Title</label>
-                        <input
-                            id={titleId}
-                            className={styles.control}
-                            type="text"
-                            placeholder="What is this note about?"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                        />
-                    </div>
-
-                    <div className={styles.field}>
-                        <label className={styles.label} htmlFor={conceptId}>Concept</label>
-                        <select
-                            id={conceptId}
-                            className={styles.control}
-                            value={concept}
-                            onChange={(e) => setConcept(e.target.value)}
-                        >
-                            <option value="" disabled>Select a concept</option>
-                            {TOPICS.map((topic) => (
-                                <option key={topic} value={topic}>{topic}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className={styles.field}>
-                        <label className={styles.label} htmlFor={fileId}>File</label>
-                        <input
-                            id={fileId}
-                            className={`${styles.control} ${styles.fileInput}`}
-                            type="file"
-                            accept=".pdf,.doc,.docx,.txt,.md"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                        />
-                    </div>
-
-                    {error && <p className={styles.error} role="alert">{error}</p>}
-
-                    <button type="submit" className={styles.button}>Upload note →</button>
-                </form>
+        <section className={styles.pane} aria-label="My notes">
+            <div className={styles.tabs} role="tablist">
+                <button
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === "write"}
+                    className={tab === "write" ? styles.active : ""}
+                    onClick={() => setTab("write")}
+                >
+                    {editingId ? "Edit note" : "New note"}
+                </button>
+                <button
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === "saved"}
+                    className={tab === "saved" ? styles.active : ""}
+                    onClick={() => setTab("saved")}
+                >
+                    Saved notes ({notes.length})
+                </button>
             </div>
 
-            {notes.length ? (
-                <ul className={styles.list}>
-                    {notes.map((note) => (
-                        <li key={note.id} className={styles.item}>
-                            <p className={styles.itemTitle}>{note.title}</p>
-                            <span className={styles.tag}>{note.topic}</span>
-                            <p className={styles.itemMeta}>
-                                {note.fileName} · {formatDay(note.createdAt)}
+            {tab === "write" ? (
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    <div className={styles.scroll}>
+                        <div className={styles.field}>
+                            <label className={styles.label} htmlFor={titleId}>Title</label>
+                            <input
+                                id={titleId}
+                                className={styles.control}
+                                type="text"
+                                placeholder="What is this note about?"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                            />
+                        </div>
+
+                        <div className={styles.field}>
+                            <label className={styles.label} htmlFor={conceptId}>Concept</label>
+                            <select
+                                id={conceptId}
+                                className={styles.control}
+                                value={concept}
+                                onChange={(e) => setConcept(e.target.value)}
+                            >
+                                <option value="" disabled>Select a concept</option>
+                                {TOPICS.map((topic) => (
+                                    <option key={topic} value={topic}>{topic}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className={styles.field}>
+                            <span className={styles.label}>
+                                Attachment <span className={styles.optional}>(optional)</span>
+                            </span>
+                            <input
+                                id={fileId}
+                                className={styles.fileInput}
+                                type="file"
+                                accept={ACCEPTED_FILES}
+                                onChange={handleFileChange}
+                                disabled={extracting}
+                            />
+                            <label htmlFor={fileId} className={styles.attach}>
+                                {extracting ? (
+                                    <LoaderCircle size={16} className={styles.spin} aria-hidden="true" />
+                                ) : (
+                                    <FileText size={16} aria-hidden="true" />
+                                )}
+                                <span>
+                                    {extracting
+                                        ? "Extracting text…"
+                                        : fileName
+                                          ? `Text added from ${fileName}. Attach another`
+                                          : "Attach a file to pull its text into your note"}
+                                </span>
+                            </label>
+                            <p className={styles.help}>
+                                PDF, Word (.docx), text, Markdown or an image, up to 5 MB. The text lands in the box
+                                below, so you can fix it before saving.
                             </p>
-                        </li>
-                    ))}
-                </ul>
+                        </div>
+
+                        <div className={styles.field}>
+                            <label className={styles.label} htmlFor={bodyId}>Note</label>
+                            <textarea
+                                id={bodyId}
+                                className={`${styles.control} ${styles.textarea}`}
+                                placeholder="Type your note here, or attach a file above to pull its text in."
+                                value={body}
+                                onChange={(e) => setBody(e.target.value)}
+                            />
+                            <p className={styles.help}>{countWords(body)} words</p>
+                        </div>
+
+                        {error && <p className={styles.error} role="alert">{error}</p>}
+                    </div>
+
+                    <div className={styles.actions}>
+                        <button type="button" className={styles.ghost} onClick={resetForm}>
+                            {editingId ? "Cancel edit" : "Clear"}
+                        </button>
+                        <button type="submit" className={styles.primary} disabled={extracting}>
+                            {editingId ? "Save changes" : "Save note"}
+                        </button>
+                    </div>
+                </form>
             ) : (
-                <p className={styles.empty}>You haven't uploaded any notes yet.</p>
+                <div className={styles.scroll}>
+                    {notes.length === 0 ? (
+                        <div className={styles.empty}>
+                            <h3>No notes yet</h3>
+                            <p>Write one in the New note tab. Only you can see it.</p>
+                        </div>
+                    ) : (
+                        <ul className={styles.list}>
+                            {notes.map((note) => {
+                                const text = note.body ?? "";
+                                const isLong = text.length > 200 || text.split("\n").length > 3;
+                                const open = expandedId === note.id;
+
+                                return (
+                                    <li key={note.id} className={styles.item}>
+                                        <div className={styles.itemHeader}>
+                                            <h3 className={styles.itemTitle}>{note.title}</h3>
+                                            <span className={styles.tag}>{note.topic}</span>
+                                        </div>
+                                        <p className={styles.itemMeta}>
+                                            {note.fileName ? `${note.fileName} · ` : ""}
+                                            {formatDay(new Date(note.createdAt))}
+                                        </p>
+                                        <p className={`${styles.itemBody} ${open ? "" : styles.clamp}`}>{text}</p>
+                                        <div className={styles.itemActions}>
+                                            {isLong && (
+                                                <button
+                                                    type="button"
+                                                    className={styles.link}
+                                                    onClick={() => setExpandedId(open ? null : note.id)}
+                                                    aria-expanded={open}
+                                                >
+                                                    {open ? "Show less" : "Show more"}
+                                                </button>
+                                            )}
+                                            <button type="button" className={styles.iconButton} onClick={() => startEdit(note)}>
+                                                <Pencil size={13} aria-hidden="true" /> Edit
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`${styles.iconButton} ${styles.danger}`}
+                                                onClick={() => handleDelete(note)}
+                                            >
+                                                <Trash2 size={13} aria-hidden="true" /> Delete
+                                            </button>
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
+                </div>
             )}
         </section>
     );
