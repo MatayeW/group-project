@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { Moon, Sun } from "lucide-react";
+import Navbar from "../../components/Navbar";
 import PersonalNotes from "../../components/PersonalNotes";
 import PublicNotes from "../../components/PublicNotes";
+import usePersonalNotes from "../../hooks/usePersonalNotes";
 import styles from "./LearnerNotesPage.module.css";
 
 const FILTERS = ["All", "Strings", "Arrays", "Loops", "Functions", "Objects", "OOP", "Recursion"];
@@ -31,57 +34,101 @@ const MOCK_NOTES = [
         from: "MD",
         date: "2026-11-05",
         time: "10:30:45",
-        message:"Parameters are the names in the function definition. Arguments are the values you pass when you call it. If a function returns undefined, check that you wrote return and did not only console.log the answer.",
+        message: "Parameters are the names in the function definition. Arguments are the values you pass when you call it. If a function returns undefined, check that you wrote return and did not only console.log the answer.",
     },
 ];
 
+// same storage key as the code page, so the light / dark choice is shared
+function getSavedTheme() {
+    try {
+        return localStorage.getItem("codeEditorTheme") === "dark" ? "dark" : "light";
+    } catch {
+        return "light";
+    }
+}
+
 const LearnerNotesPage = () => {
     const [activeFilter, setActiveFilter] = useState("All");
+    const [theme, setTheme] = useState(getSavedTheme);
+    const { notes, saveNote, deleteNote } = usePersonalNotes();
 
-    const visibleNotes = activeFilter === "All" ? MOCK_NOTES : MOCK_NOTES.filter((note) => note.label === activeFilter);
+    const visibleNotes =
+        activeFilter === "All" ? MOCK_NOTES : MOCK_NOTES.filter((note) => note.label === activeFilter);
+
+    function toggleTheme() {
+        const newTheme = theme === "dark" ? "light" : "dark";
+        setTheme(newTheme);
+        try {
+            localStorage.setItem("codeEditorTheme", newTheme);
+        } catch {
+            // storage is blocked: the theme still changes, it just won't be remembered
+        }
+    }
 
     return (
-        <div className={styles.page}>
-            <header>
-                <h1 className={styles.pageTitle}>Learning</h1>
-                <p className={styles.pageSubtitle}>Notes from your mentor, plus your own.</p>
-            </header>
+        <div className="layout">
+            <Navbar />
 
-            <div className={styles.columns}>
-                <section aria-labelledby="mentor-notes-heading">
-                    <h2 id="mentor-notes-heading" className={styles.sectionTitle}>
-                        Notes from your mentor
-                    </h2>
-
-                    <div className={styles.filters} role="group" aria-label="Filter notes by concept">
-                        {FILTERS.map((filter) => (
-                            <button
-                                key={filter}
-                                type="button"
-                                className={styles.filter}
-                                aria-pressed={activeFilter === filter}
-                                onClick={() => setActiveFilter(filter)}
-                            >
-                                {filter}
-                            </button>
-                        ))}
+            <div className={styles.page} data-theme={theme}>
+                {/* toolbar: breadcrumb, note counts and the theme button */}
+                <header className={styles.toolbar}>
+                    <div className={styles.breadcrumb}>
+                        Learning <span>/</span> <strong>Notes</strong>
                     </div>
 
-                    {visibleNotes.length ? (
-                        <div className={styles.noteList}>
-                            {visibleNotes.map((note) => (
-                                <PublicNotes key={note.id} {...note} />
+                    <p className={styles.summary}>
+                        <strong>{MOCK_NOTES.length}</strong> mentor notes · <strong>{notes.length}</strong> personal notes
+                    </p>
+
+                    <div className={styles.toolbarRight}>
+                        <button
+                            type="button"
+                            className={styles.themeToggle}
+                            onClick={toggleTheme}
+                            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                            title={theme === "dark" ? "Light mode" : "Dark mode"}
+                        >
+                            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+                        </button>
+                    </div>
+                </header>
+
+                <div className={styles.workspace}>
+                    {/* LEFT: notes from the mentor */}
+                    <section className={styles.pane} aria-labelledby="mentor-notes-heading">
+                        <div className={styles.paneTabs}>
+                            <h2 id="mentor-notes-heading">Notes from your mentor</h2>
+                        </div>
+
+                        <div className={styles.filters} role="group" aria-label="Filter notes by concept">
+                            {FILTERS.map((filter) => (
+                                <button
+                                    key={filter}
+                                    type="button"
+                                    className={styles.filter}
+                                    aria-pressed={activeFilter === filter}
+                                    onClick={() => setActiveFilter(filter)}
+                                >
+                                    {filter}
+                                </button>
                             ))}
                         </div>
-                    ) : (
-                        <p className={styles.empty}>
-                            {activeFilter === "All" ? "Your mentor hasn't posted any notes yet." : `No ${activeFilter} notes yet.`}
-                        </p>
-                    )}
-                </section>
 
-                <div className={styles.personal}>
-                    <PersonalNotes />
+                        <div className={styles.paneScroll}>
+                            {visibleNotes.length ? (
+                                visibleNotes.map((note) => <PublicNotes key={note.id} {...note} />)
+                            ) : (
+                                <p className={styles.empty}>
+                                    {activeFilter === "All"
+                                        ? "Your mentor hasn't posted any notes yet."
+                                        : `No ${activeFilter} notes yet.`}
+                                </p>
+                            )}
+                        </div>
+                    </section>
+
+                    {/* RIGHT: your own notes */}
+                    <PersonalNotes notes={notes} onSave={saveNote} onDelete={deleteNote} />
                 </div>
             </div>
         </div>
