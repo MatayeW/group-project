@@ -1,0 +1,51 @@
+.card {
+    padding: 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.tag {
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--color-chip);
+    color: var(--color-muted);
+    font-size: 0.72rem;
+    font-weight: 500;
+}
+
+.meta {
+    margin: 6px 0 12px;
+    font-size: 0.72rem;
+    color: var(--color-muted);
+}
+
+.message {
+    margin: 0;
+    max-width: 62ch;
+    font-size: 0.875rem;
+    line-height: 1.7;
+}
+
+.attachment {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--color-chip);
+    color: var(--color-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+}

@@ -1,0 +1,102 @@
+.page {
+    width: min(924px, 100% - 48px);
+    margin-inline: auto;
+    padding: 32px 0 48px;
+    color: var(--color-text);
+}
+
+.pageTitle {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.pageSubtitle {
+    margin: 4px 0 0;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+}
+
+/* Two columns: mentor notes (flexible) + personal notes (fixed) */
+.columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+    gap: 20px;
+    margin-top: 28px;
+}
+
+.sectionTitle {
+    margin: 0 0 12px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* ---------- Filters ---------- */
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.filter {
+    padding: 4px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-muted);
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.filter:hover {
+    background: var(--color-chip);
+    color: var(--color-text);
+}
+
+.filter:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Declared after :hover with equal specificity, so it wins while hovered too */
+.filter[aria-pressed="true"] {
+    background: var(--color-accent);
+    color: #fff;
+}
+
+/* ---------- Notes ---------- */
+
+.noteList {
+    display: grid;
+    gap: 16px;
+}
+
+.empty {
+    margin: 0;
+    padding: 24px 18px;
+    border: 1px dashed var(--color-border);
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+.personal {
+    position: sticky;
+    top: 24px;
+}
+
+@media (max-width: 900px) {
+    .columns {
+        grid-template-columns: 1fr;
+    }
+
+    .personal {
+        position: static;
+    }
+}
