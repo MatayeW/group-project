@@ -5,6 +5,7 @@ import {
     MAX_FILE_SIZE,
     extractText,
 } from "../utils/extractText";
+import ConfirmDialog from "./ConfirmDialog";
 import styles from "./PersonalNotes.module.css";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -34,6 +35,7 @@ const PersonalNotes = ({ notes, onSave, onDelete }) => {
     const [extracting, setExtracting] = useState(false);
     const [error, setError] = useState("");
     const [expandedId, setExpandedId] = useState(null);
+    const [noteToDelete, setNoteToDelete] = useState(null); // the note waiting for a yes / no
 
     // counts up each time a file is picked, so an old extraction can't overwrite a newer one
     const latestRun = useRef(0);
@@ -124,10 +126,12 @@ const PersonalNotes = ({ notes, onSave, onDelete }) => {
         setTab("write");
     };
 
-    const handleDelete = (note) => {
-        if (!window.confirm(`Delete "${note.title}"?`)) return;
-        onDelete(note.id);
-        if (editingId === note.id) resetForm();
+    const askToDelete = (note) => setNoteToDelete(note);
+
+    const confirmDelete = () => {
+        onDelete(noteToDelete.id);
+        if (editingId === noteToDelete.id) resetForm();
+        setNoteToDelete(null);
     };
 
     return (
@@ -220,7 +224,7 @@ const PersonalNotes = ({ notes, onSave, onDelete }) => {
                             <textarea
                                 id={bodyId}
                                 className={`${styles.control} ${styles.textarea}`}
-                                placeholder="Type your note here, or attach a file above to pull its text in."
+                                placeholder="Type notes. Attached"
                                 value={body}
                                 onChange={(e) => setBody(e.target.value)}
                             />
@@ -281,7 +285,7 @@ const PersonalNotes = ({ notes, onSave, onDelete }) => {
                                             <button
                                                 type="button"
                                                 className={`${styles.iconButton} ${styles.danger}`}
-                                                onClick={() => handleDelete(note)}
+                                                onClick={() => askToDelete(note)}
                                             >
                                                 <Trash2 size={13} aria-hidden="true" /> Delete
                                             </button>
@@ -293,6 +297,19 @@ const PersonalNotes = ({ notes, onSave, onDelete }) => {
                     )}
                 </div>
             )}
+
+            <ConfirmDialog
+                open={noteToDelete !== null}
+                title="Delete this note?"
+                message={
+                    noteToDelete
+                        ? `"${noteToDelete.title}" will be permanently deleted. This can't be undone.`
+                        : ""
+                }
+                confirmLabel="Delete"
+                onConfirm={confirmDelete}
+                onCancel={() => setNoteToDelete(null)}
+            />
         </section>
     );
 };
