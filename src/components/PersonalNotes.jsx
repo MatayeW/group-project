@@ -7,14 +7,7 @@ import {
 } from "../utils/extractText";
 import ConfirmDialog from "./ConfirmDialog";
 import styles from "./PersonalNotes.module.css";
-
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-const isSameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-
-const formatDay = (date, now = new Date()) =>
-    isSameDay(date, now) ? "Today" : `${WEEKDAYS[date.getDay()]} ${date.getDate()} ${MONTHS[date.getMonth()]}`;
+import { formatDay } from "../utils/dateFunctions";
 
 const TOPICS = [
     "Integers", "Strings", "Arrays", "Booleans", "Arithmetic", "Bitwise",
