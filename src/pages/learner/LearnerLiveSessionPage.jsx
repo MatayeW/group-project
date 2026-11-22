@@ -1,5 +1,14 @@
+import Navbar from "../../components/Navbar";
+import LiveSessions from "../../components/LiveSessions";
+import CodeEditor from "../../components/CodeEditor";
+
 const LearnerLiveSessionPage = () => {
-    return <h1>This is the Learner Live Session Page</h1>;
-}
+    return (
+        <div className="layout">
+            <Navbar />
+            <LiveSessions />
+        </div>
+    );
+};
 
 export default LearnerLiveSessionPage;
