@@ -8,7 +8,7 @@ import {
     PanelLeftClose,
     PanelLeftOpen,
 } from "lucide-react";
-import logo from "../assets/cohort51-darkbackground.png";
+import logo from "../assets/cohort51-lightbackground.png";
 import "./Navbar.css";
 
 const NAV_ITEMS = [
