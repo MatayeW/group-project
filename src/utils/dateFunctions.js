@@ -15,3 +15,18 @@ export const formatNoteDate = (iso, time) => {
     const day = formatDay(parseISODate(iso));
     return day === "Today" && time ? `Today ${time.slice(0, 5)}` : day;
 };
+
+export const pad = (number) => String(number).padStart(2, "0");
+
+export function formatPosted(iso, now = new Date()) {
+    const date = new Date(iso);
+    const time = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+
+    if (isSameDay(date, now)) return `Today ${time}`;
+
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    if (isSameDay(date, yesterday)) return `Yesterday ${time}`;
+
+    return `${WEEKDAYS[date.getDay()]} ${date.getDate()} ${MONTHS[date.getMonth()]}`;
+}

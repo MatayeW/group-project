@@ -1,0 +1,51 @@
+.card {
+    padding: 20px 18px 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+}
+
+.titleRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.title {
+    color: var(--heading);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.badge {
+    padding: 2px 8px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    color: var(--chip-text);
+    background: var(--chip-bg);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.new {
+    border-color: var(--accent-border);
+    color: var(--accent-text);
+    background: var(--accent-soft);
+}
+
+.meta {
+    margin: 8px 0 12px;
+    color: var(--muted);
+    font-family: "DM Mono", ui-monospace, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.body {
+    max-width: 60ch;
+    color: var(--text);
+    font-size: 13.5px;
+    line-height: 1.65;
+}
