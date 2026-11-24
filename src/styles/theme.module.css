@@ -1,0 +1,98 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+.theme {
+    --page-bg: #f5f4f9;
+    --surface: #ffffff;
+    --surface-alt: #f4f3f8;
+    --card-bg: #f8f8fa;
+    --card-border: #e9e7ee;
+    --line: #e6e4ec;
+    --line-soft: #ebeaf0;
+
+    --heading: #1b1a2e;
+    --text: #2c2a3d;
+    --strong: #363448;
+    --copy: #545160;
+    --muted: #7a778c;
+    --muted-strong: #5d5a70;
+    --tab: #8c8999;
+    --tab-active: #4d466f;
+
+    --chip-bg: #f2f1f5;
+    --chip-text: #716e7e;
+
+    --accent: #7c6ee6;
+    --accent-strong: #7c6cff;
+    --accent-text: #5d54b2;
+    --accent-soft: #eeecff;
+    --accent-border: #d6d1fb;
+
+    --streak-bg: #fdf3dc;
+    --streak-text: #8a5a00;
+    --streak-border: #f0dfb0;
+
+    --control-border: #e3e1ea;
+    --control-text: #656276;
+    --control-bg: #ffffff;
+    --control-hover-border: #bdb8df;
+    --control-hover-text: #5d54b2;
+
+    --primary-bg: #34315f;
+    --primary-hover: #443f7d;
+    --primary-text: #ffffff;
+    --error: #c94f70;
+
+    background: var(--page-bg);
+    color: var(--text);
+    font-family: "Manrope", system-ui, sans-serif;
+    font-size: 13px;
+}
+
+.theme[data-theme="dark"] {
+    --page-bg: #11111c;
+    --surface: #1b1a2a;
+    --surface-alt: #242334;
+    --card-bg: #222130;
+    --card-border: #353345;
+    --line: #302e40;
+    --line-soft: #343244;
+
+    --heading: #f0eef7;
+    --text: #d3d0de;
+    --strong: #e0dde9;
+    --copy: #bab6c5;
+    --muted: #9692a3;
+    --muted-strong: #bab6c5;
+    --tab: #8c8899;
+    --tab-active: #c7c1ff;
+
+    --chip-bg: #2a2839;
+    --chip-text: #aaa6b5;
+
+    --accent: #a79cff;
+    --accent-strong: #7c6cff;
+    --accent-text: #c2bcff;
+    --accent-soft: #302d4c;
+    --accent-border: #4a4580;
+
+    --streak-bg: #3a2f14;
+    --streak-text: #f3cf7a;
+    --streak-border: #5a4a1f;
+
+    --control-border: #3a384a;
+    --control-text: #aaa6b7;
+    --control-bg: #242334;
+    --control-hover-border: #6f67b8;
+    --control-hover-text: #c2bcff;
+
+    --primary-bg: #a79cff;
+    --primary-hover: #b9b0ff;
+    --primary-text: #242038;
+    --error: #f06ba5;
+}
+
+.theme h1,
+.theme h2,
+.theme h3 {
+    color: var(--heading);
+}

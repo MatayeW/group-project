@@ -1,0 +1,124 @@
+.topBar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: 64px;
+    flex: 0 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.search {
+    flex: 1;
+    max-width: 420px;
+    height: 40px;
+    padding: 0 10px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--muted);
+    background: var(--surface-alt);
+}
+
+.search:focus-within {
+    border-color: var(--accent);
+    outline: 2px solid var(--accent-border);
+}
+
+.search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    color: var(--heading);
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+}
+
+.search input::placeholder {
+    color: var(--muted);
+}
+
+.shortcut {
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--muted);
+    background: var(--chip-bg);
+    font-family: "DM Mono", ui-monospace, Consolas, monospace;
+    font-size: 10px;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.streak {
+    padding: 4px 9px;
+    border: 1px solid var(--streak-border);
+    border-radius: 5px;
+    color: var(--streak-text);
+    background: var(--streak-bg);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.iconButton {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--control-text);
+    background: var(--surface);
+    cursor: pointer;
+}
+
+.iconButton:hover {
+    border-color: var(--control-hover-border);
+    color: var(--control-hover-text);
+}
+
+.iconButton:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.badge {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: #fff;
+    background: var(--accent-strong);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    .topBar {
+        padding: 0 14px;
+    }
+
+    .streak,
+    .shortcut {
+        display: none;
+    }
+}
