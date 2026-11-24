@@ -1,156 +1,23 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap");
-
-/* ---------- THEME COLOURS ----------
-   Same palette as the code page. Light colours live on .page; the dark ones
-   are the same names with new values, applied when data-theme="dark".
-   PersonalNotes.module.css and PublicNotes.module.css read these variables too. */
-.page {
-    --page-bg: #f4f4f8;
-    --text: #26253a;
-    --toolbar-bg: #ffffff;
-    --pane-bg: #ffffff;
-    --card-bg: #f8f8fa;
-    --card-border: #e9e7ee;
-    --line: #e3e2ea;
-    --line-soft: #ebeaf0;
-    --muted: #8f8ca0;
-    --strong: #363448;
-    --heading: #252337;
-    --copy: #545160;
-    --tab: #8c8999;
-    --tab-active: #4d466f;
-    --control-border: #e3e1ea;
-    --control-text: #656276;
-    --control-bg: #ffffff;
-    --control-hover-border: #bdb8df;
-    --control-hover-text: #5d54b2;
-    --chip-text: #716e7e;
-    --chip-bg: #f2f1f5;
-    --level-text: #6359bc;
-    --level-bg: #eeecff;
-    --accent: #7c6ee6;
-    --primary-bg: #34315f;
-    --primary-hover: #443f7d;
-    --primary-text: #ffffff;
-    --error: #c94f70;
-
-    /* the names PublicNotes.module.css was already using */
-    --color-text: var(--copy);
-    --color-muted: var(--muted);
-    --color-border: var(--card-border);
-    --color-surface: var(--card-bg);
-    --color-chip: var(--chip-bg);
-    --color-accent: var(--accent);
-    --color-error: var(--error);
-}
-
-.page[data-theme="dark"] {
-    --page-bg: #11111c;
-    --text: #d8d5e2;
-    --toolbar-bg: #191824;
-    --pane-bg: #1b1a2a;
-    --card-bg: #222130;
-    --card-border: #353345;
-    --line: #302e40;
-    --line-soft: #343244;
-    --muted: #9692a3;
-    --strong: #e0dde9;
-    --heading: #f0eef7;
-    --copy: #bab6c5;
-    --tab: #8c8899;
-    --tab-active: #c7c1ff;
-    --control-border: #3a384a;
-    --control-text: #aaa6b7;
-    --control-bg: #242334;
-    --control-hover-border: #6f67b8;
-    --control-hover-text: #c2bcff;
-    --chip-text: #aaa6b5;
-    --chip-bg: #2a2839;
-    --level-text: #b8b0ff;
-    --level-bg: #302d4c;
-    --accent: #a79cff;
-    --primary-bg: #a79cff;
-    --primary-hover: #b9b0ff;
-    --primary-text: #242038;
-    --error: #f06ba5;
-}
+/* Colours, fonts and the light / dark switch come from the shared theme
+   (styles/theme.module.css), the same one the Announcements page uses.
+   PersonalNotes, PublicNotes and the delete dialog read those variables too. */
 
 /* the whole page area to the right of the Navbar */
 .page {
+    composes: theme from "../../styles/theme.module.css";
     flex: 1;
     min-width: 0;
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background: var(--page-bg);
-    color: var(--text);
-    font-family: "Manrope", system-ui, sans-serif;
-    font-size: 13px;
 }
 
-.page h1,
-.page h2,
-.page h3 {
-    color: var(--heading);
-}
-
-/* ---------- Toolbar ---------- */
-
-.toolbar {
-    min-height: 56px;
-    flex: 0 0 auto;
-    padding: 0 22px;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 18px;
-    border-bottom: 1px solid var(--line);
-    background: var(--toolbar-bg);
-}
-
-.breadcrumb {
-    min-width: 0;
+.main {
+    flex: 1;
+    min-height: 0;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--muted);
-    font-size: 13px;
-}
-
-.breadcrumb strong {
-    color: var(--strong);
-}
-
-.summary {
-    color: var(--muted);
-    font-size: 12px;
-}
-
-.summary strong {
-    color: var(--strong);
-}
-
-.toolbarRight {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-.themeToggle {
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    border: 1px solid var(--control-border);
-    border-radius: 50%;
-    color: var(--control-text);
-    background: var(--control-bg);
-    cursor: pointer;
-}
-
-.themeToggle:hover {
-    border-color: var(--control-hover-border);
-    color: var(--control-hover-text);
+    flex-direction: column;
+    padding: 32px 24px 24px;
 }
 
 /* ---------- Workspace: mentor notes | my notes ---------- */
@@ -158,11 +25,10 @@
 .workspace {
     flex: 1;
     min-height: 0;
-    padding: 12px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
-    gap: 12px;
+    gap: 14px;
 }
 
 .pane {
@@ -172,8 +38,8 @@
     flex-direction: column;
     overflow: hidden;
     border: 1px solid var(--line);
-    border-radius: 9px;
-    background: var(--pane-bg);
+    border-radius: 12px;
+    background: var(--surface);
 }
 
 .paneTabs {
@@ -241,8 +107,8 @@
 
 /* declared after :hover with equal specificity, so it wins while hovered too */
 .filter[aria-pressed="true"] {
-    color: var(--level-text);
-    background: var(--level-bg);
+    color: var(--accent-text);
+    background: var(--accent-soft);
 }
 
 /* ---------- Mentor notes ---------- */
@@ -259,11 +125,11 @@
 }
 
 .empty {
-    padding: 24px 18px;
+    padding: 28px 18px;
     border: 1px dashed var(--line);
-    border-radius: 9px;
+    border-radius: 12px;
     color: var(--muted);
-    font-size: 13px;
+    text-align: center;
 }
 
 /* smaller screens: stack the two panes */
@@ -271,16 +137,6 @@
     .page {
         height: auto;
         min-height: 100vh;
-    }
-
-    .toolbar {
-        grid-template-columns: 1fr auto;
-        padding: 10px 16px;
-        gap: 8px;
-    }
-
-    .summary {
-        display: none;
     }
 
     .workspace {
@@ -291,5 +147,11 @@
     .pane,
     .workspace > section:last-child {
         min-height: 520px;
+    }
+}
+
+@media (max-width: 640px) {
+    .main {
+        padding: 24px 14px 32px;
     }
 }

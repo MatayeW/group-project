@@ -8,8 +8,8 @@
     flex-direction: column;
     overflow: hidden;
     border: 1px solid var(--line);
-    border-radius: 9px;
-    background: var(--pane-bg);
+    border-radius: 12px;
+    background: var(--surface);
 }
 
 /* tabs: same look as the Description / Submissions tabs on the code page */
@@ -181,7 +181,7 @@
     align-items: center;
     justify-content: space-between;
     border-top: 1px solid var(--line);
-    background: var(--toolbar-bg);
+    background: var(--surface);
 }
 
 .actions button {
@@ -232,9 +232,9 @@
 }
 
 .item {
-    padding: 16px 18px;
+    padding: 20px 18px 18px;
     border: 1px solid var(--card-border);
-    border-radius: 7px;
+    border-radius: 12px;
     background: var(--card-bg);
 }
 
@@ -246,7 +246,7 @@
 
 .itemTitle {
     min-width: 0;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
 }
 
@@ -254,22 +254,25 @@
     flex: 0 0 auto;
     padding: 3px 8px;
     border-radius: 5px;
-    color: var(--level-text);
-    background: var(--level-bg);
+    color: var(--accent-text);
+    background: var(--accent-soft);
     font-size: 11px;
     font-weight: 600;
 }
 
 .itemMeta {
-    margin: 4px 0 10px;
+    margin: 8px 0 12px;
     color: var(--muted);
-    font-size: 11.5px;
+    font-size: 11px;
+    font-family: "DM Mono", ui-monospace, Consolas, monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .itemBody {
-    color: var(--copy);
+    color: var(--text);
     font-size: 13.5px;
-    line-height: 1.7;
+    line-height: 1.65;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
@@ -281,23 +284,18 @@
     margin-top: 12px;
 }
 
-.link,
 .iconButton {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     padding: 0;
     border: 0;
-    color: var(--level-text);
+    color: var(--control-text);
     background: transparent;
     font: inherit;
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
-}
-
-.iconButton {
-    color: var(--control-text);
 }
 
 .iconButton:hover {
@@ -308,11 +306,6 @@
     color: var(--error);
 }
 
-.link {
-    margin-right: auto;
-}
-
-.link:focus-visible,
 .iconButton:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;

@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Moon, Sun } from "lucide-react";
 import Navbar from "../../components/Navbar";
+import TopBar from "../../components/TopBar";
+import PageHeader from "../../components/PageHeader";
 import PersonalNotes from "../../components/PersonalNotes";
 import PublicNotes from "../../components/PublicNotes";
 import usePersonalNotes from "../../hooks/usePersonalNotes";
+import useAnnouncements from "../../hooks/useAnnouncements";
+import useTheme from "../../hooks/useTheme";
 import styles from "./LearnerNotesPage.module.css";
 
 const FILTERS = ["All", "Strings", "Arrays", "Loops", "Functions", "Objects", "OOP", "Recursion"];
@@ -38,98 +41,84 @@ const MOCK_NOTES = [
     },
 ];
 
-// same storage key as the code page, so the light / dark choice is shared
-function getSavedTheme() {
-    try {
-        return localStorage.getItem("codeEditorTheme") === "dark" ? "dark" : "light";
-    } catch {
-        return "light";
-    }
-}
-
 const LearnerNotesPage = () => {
     const [activeFilter, setActiveFilter] = useState("All");
-    const [theme, setTheme] = useState(getSavedTheme);
+    const [query, setQuery] = useState("");
     const { notes, saveNote, deleteNote } = usePersonalNotes();
+    const { unreadCount } = useAnnouncements();
+    const { theme, toggleTheme } = useTheme();
 
-    const visibleNotes =
-        activeFilter === "All" ? MOCK_NOTES : MOCK_NOTES.filter((note) => note.label === activeFilter);
+    // the TopBar search box filters the mentor notes and the saved personal notes
+    const search = query.trim().toLowerCase();
 
-    function toggleTheme() {
-        const newTheme = theme === "dark" ? "light" : "dark";
-        setTheme(newTheme);
-        try {
-            localStorage.setItem("codeEditorTheme", newTheme);
-        } catch {
-            // storage is blocked: the theme still changes, it just won't be remembered
-        }
-    }
+    const visibleNotes = MOCK_NOTES.filter(
+        (note) =>
+            (activeFilter === "All" || note.label === activeFilter) &&
+            (!search || `${note.title} ${note.label} ${note.message}`.toLowerCase().includes(search))
+    );
 
     return (
         <div className="layout">
             <Navbar />
 
             <div className={styles.page} data-theme={theme}>
-                {/* toolbar: breadcrumb, note counts and the theme button */}
-                <header className={styles.toolbar}>
-                    <div className={styles.breadcrumb}>
-                        Learning <span>/</span> <strong>Notes</strong>
+                <TopBar
+                    searchValue={query}
+                    onSearchChange={setQuery}
+                    searchPlaceholder="Search notes"
+                    streak={4}
+                    unreadCount={unreadCount}
+                    theme={theme}
+                    onToggleTheme={toggleTheme}
+                />
+
+                <main className={styles.main}>
+                    <PageHeader
+                        title="Learning"
+                        subtitle="Notes from your mentor, and your own."
+                        status={`${MOCK_NOTES.length} mentor notes · ${notes.length} personal notes`}
+                    />
+
+                    <div className={styles.workspace}>
+                        {/* LEFT: notes from the mentor */}
+                        <section className={styles.pane} aria-labelledby="mentor-notes-heading">
+                            <div className={styles.paneTabs}>
+                                <h2 id="mentor-notes-heading">Notes from your mentor</h2>
+                            </div>
+
+                            <div className={styles.filters} role="group" aria-label="Filter notes by concept">
+                                {FILTERS.map((filter) => (
+                                    <button
+                                        key={filter}
+                                        type="button"
+                                        className={styles.filter}
+                                        aria-pressed={activeFilter === filter}
+                                        onClick={() => setActiveFilter(filter)}
+                                    >
+                                        {filter}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className={styles.paneScroll}>
+                                {visibleNotes.length ? (
+                                    visibleNotes.map((note) => <PublicNotes key={note.id} {...note} />)
+                                ) : (
+                                    <p className={styles.empty}>
+                                        {search
+                                            ? `No notes match "${query.trim()}".`
+                                            : activeFilter === "All"
+                                              ? "Your mentor hasn't posted any notes yet."
+                                              : `No ${activeFilter} notes yet.`}
+                                    </p>
+                                )}
+                            </div>
+                        </section>
+
+                        {/* RIGHT: your own notes */}
+                        <PersonalNotes notes={notes} query={query} onSave={saveNote} onDelete={deleteNote} />
                     </div>
-
-                    <p className={styles.summary}>
-                        <strong>{MOCK_NOTES.length}</strong> mentor notes · <strong>{notes.length}</strong> personal notes
-                    </p>
-
-                    <div className={styles.toolbarRight}>
-                        <button
-                            type="button"
-                            className={styles.themeToggle}
-                            onClick={toggleTheme}
-                            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-                            title={theme === "dark" ? "Light mode" : "Dark mode"}
-                        >
-                            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-                        </button>
-                    </div>
-                </header>
-
-                <div className={styles.workspace}>
-                    {/* LEFT: notes from the mentor */}
-                    <section className={styles.pane} aria-labelledby="mentor-notes-heading">
-                        <div className={styles.paneTabs}>
-                            <h2 id="mentor-notes-heading">Notes from your mentor</h2>
-                        </div>
-
-                        <div className={styles.filters} role="group" aria-label="Filter notes by concept">
-                            {FILTERS.map((filter) => (
-                                <button
-                                    key={filter}
-                                    type="button"
-                                    className={styles.filter}
-                                    aria-pressed={activeFilter === filter}
-                                    onClick={() => setActiveFilter(filter)}
-                                >
-                                    {filter}
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className={styles.paneScroll}>
-                            {visibleNotes.length ? (
-                                visibleNotes.map((note) => <PublicNotes key={note.id} {...note} />)
-                            ) : (
-                                <p className={styles.empty}>
-                                    {activeFilter === "All"
-                                        ? "Your mentor hasn't posted any notes yet."
-                                        : `No ${activeFilter} notes yet.`}
-                                </p>
-                            )}
-                        </div>
-                    </section>
-
-                    {/* RIGHT: your own notes */}
-                    <PersonalNotes notes={notes} onSave={saveNote} onDelete={deleteNote} />
-                </div>
+                </main>
             </div>
         </div>
     );

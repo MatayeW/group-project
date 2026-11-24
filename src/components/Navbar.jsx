@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
     Home,
@@ -10,6 +9,10 @@ import {
 } from "lucide-react";
 import logo from "../assets/cohort51-lightbackground.png";
 import "./Navbar.css";
+import useAnnouncements from "../hooks/useAnnouncements";
+import useSidebarCollapsed from "../hooks/useSidebarCollapsed";
+import { CURRENT_USER } from "../data/currentUser";
+import { getInitials } from "../utils/getInitials";
 
 const NAV_ITEMS = [
     { id: "home", label: "Home", icon: Home, to: "/", end: true },
@@ -20,20 +23,15 @@ const NAV_ITEMS = [
 
 const NUMBER_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
 
-const getInitials = (name) =>
-    name
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0].toUpperCase())
-        .join("");
-
 const Navbar = ({
     homework = { completed: 1, total: 3, due: "Friday" },
-    user = { name: "June Makhubela", role: "Learner", rank: 4, xp: 980, status: "Online" },
-    unreadAnnouncements = 1,
+    user = CURRENT_USER,
+    unreadAnnouncements,
 }) => {
-    const [collapsed, setCollapsed] = useState(false);
+    // remembered between pages (every page renders its own Navbar)
+    const [collapsed, toggleCollapsed] = useSidebarCollapsed();
+    const { unreadCount } = useAnnouncements();
+    const unread = unreadAnnouncements ?? unreadCount;
 
     const { completed, total, due } = homework;
     const remaining = Math.max(total - completed, 0);
@@ -59,7 +57,7 @@ const Navbar = ({
                 <button
                     type="button"
                     className="toggle"
-                    onClick={() => setCollapsed((prev) => !prev)}
+                    onClick={toggleCollapsed}
                     aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                     aria-expanded={!collapsed}
                 >
@@ -72,7 +70,7 @@ const Navbar = ({
             <nav aria-label="Main">
                 <ul className="nav">
                     {NAV_ITEMS.map(({ id, label, icon: Icon, to, end }) => {
-                        const badge = id === "announcements" ? unreadAnnouncements : 0;
+                        const badge = id === "announcements" ? unread : 0;
 
                         return (
                             <li key={id}>

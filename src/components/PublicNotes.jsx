@@ -1,3 +1,4 @@
+import ExpandableText from "./ExpandableText";
 import styles from "./PublicNotes.module.css";
 import { formatNoteDate } from "../utils/dateFunctions";
 
@@ -10,13 +11,13 @@ const PublicNotes = ({ title, label, from, date, time, message, attachment }) =>
             </header>
 
             <p className={styles.meta}>
-                Posted by {from} . {formatNoteDate(date, time)}
+                Posted by {from} · {formatNoteDate(date, time)}
             </p>
 
-            <p className={styles.message}>{message}</p>
+            <ExpandableText text={message} lines={4} className={styles.message} />
 
             {attachment && (
-                <span className={styles.attachment}>Attachment . {attachment}</span>
+                <span className={styles.attachment}>Attachment · {attachment}</span>
             )}
         </article>
     );

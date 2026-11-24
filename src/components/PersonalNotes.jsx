@@ -6,6 +6,7 @@ import {
     extractText,
 } from "../utils/extractText";
 import ConfirmDialog from "./ConfirmDialog";
+import ExpandableText from "./ExpandableText";
 import styles from "./PersonalNotes.module.css";
 import { formatDay } from "../utils/dateFunctions";
 
@@ -18,7 +19,7 @@ const TOPICS = [
 
 const countWords = (text) => (text.trim() ? text.trim().split(/\s+/).length : 0);
 
-const PersonalNotes = ({ notes, onSave, onDelete }) => {
+const PersonalNotes = ({ notes, query="", onSave, onDelete }) => {
     const [tab, setTab] = useState("write"); // "write" or "saved"
     const [editingId, setEditingId] = useState(null);
     const [title, setTitle] = useState("");
@@ -27,7 +28,6 @@ const PersonalNotes = ({ notes, onSave, onDelete }) => {
     const [fileName, setFileName] = useState("");
     const [extracting, setExtracting] = useState(false);
     const [error, setError] = useState("");
-    const [expandedId, setExpandedId] = useState(null);
     const [noteToDelete, setNoteToDelete] = useState(null); // the note waiting for a yes / no
 
     // counts up each time a file is picked, so an old extraction can't overwrite a newer one
@@ -126,6 +126,13 @@ const PersonalNotes = ({ notes, onSave, onDelete }) => {
         if (editingId === noteToDelete.id) resetForm();
         setNoteToDelete(null);
     };
+    // the TopBar search box on the Learning page filters the saved list
+    const search = query.trim().toLowerCase();
+    const visibleNotes = search
+        ? notes.filter((note) =>
+              `${note.title} ${note.topic} ${note.body ?? ""}`.toLowerCase().includes(search)
+          )
+        : notes;
 
     return (
         <section className={styles.pane} aria-label="My notes">
@@ -236,60 +243,40 @@ const PersonalNotes = ({ notes, onSave, onDelete }) => {
                         </button>
                     </div>
                 </form>
-            ) : (
-                <div className={styles.scroll}>
-                    {notes.length === 0 ? (
+            ) : visibleNotes.length === 0 ? (
                         <div className={styles.empty}>
-                            <h3>No notes yet</h3>
-                            <p>Write one in the New note tab. Only you can see it.</p>
+                            <h3>No matching notes</h3>
+                            <p>{`Nothing saved matches "${query.trim()}".`}</p>
                         </div>
                     ) : (
                         <ul className={styles.list}>
-                            {notes.map((note) => {
-                                const text = note.body ?? "";
-                                const isLong = text.length > 200 || text.split("\n").length > 3;
-                                const open = expandedId === note.id;
-
-                                return (
-                                    <li key={note.id} className={styles.item}>
-                                        <div className={styles.itemHeader}>
-                                            <h3 className={styles.itemTitle}>{note.title}</h3>
-                                            <span className={styles.tag}>{note.topic}</span>
-                                        </div>
-                                        <p className={styles.itemMeta}>
-                                            {note.fileName ? `${note.fileName} · ` : ""}
-                                            {formatDay(new Date(note.createdAt))}
-                                        </p>
-                                        <p className={`${styles.itemBody} ${open ? "" : styles.clamp}`}>{text}</p>
-                                        <div className={styles.itemActions}>
-                                            {isLong && (
-                                                <button
-                                                    type="button"
-                                                    className={styles.link}
-                                                    onClick={() => setExpandedId(open ? null : note.id)}
-                                                    aria-expanded={open}
-                                                >
-                                                    {open ? "Show less" : "Show more"}
-                                                </button>
-                                            )}
-                                            <button type="button" className={styles.iconButton} onClick={() => startEdit(note)}>
-                                                <Pencil size={13} aria-hidden="true" /> Edit
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={`${styles.iconButton} ${styles.danger}`}
-                                                onClick={() => askToDelete(note)}
-                                            >
-                                                <Trash2 size={13} aria-hidden="true" /> Delete
-                                            </button>
-                                        </div>
-                                    </li>
-                                );
-                            })}
+                           {visibleNotes.map((note) => (
+                                <li key={note.id} className={styles.item}>
+                                    <div className={styles.itemHeader}>
+                                        <h3 className={styles.itemTitle}>{note.title}</h3>
+                                        <span className={styles.tag}>{note.topic}</span>
+                                    </div>
+                                    <p className={styles.itemMeta}>
+                                        {note.fileName ? `${note.fileName} · ` : ""}
+                                        {formatDay(new Date(note.createdAt))}
+                                    </p>
+                                    <ExpandableText text={note.body ?? ""} lines={3} className={styles.itemBody} />
+                                    <div className={styles.itemActions}>
+                                        <button type="button" className={styles.iconButton} onClick={() => startEdit(note)}>
+                                            <Pencil size={13} aria-hidden="true" /> Edit
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={`${styles.iconButton} ${styles.danger}`}
+                                            onClick={() => askToDelete(note)}
+                                        >
+                                            <Trash2 size={13} aria-hidden="true" /> Delete
+                                        </button>
+                                    </div>
+                                </li>
+                            ))}
                         </ul>
                     )}
-                </div>
-            )}
 
             <ConfirmDialog
                 open={noteToDelete !== null}

@@ -1,0 +1,29 @@
+.clamped {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--lines, 3);
+    line-clamp: var(--lines, 3);
+    overflow: hidden;
+}
+
+.toggle {
+    margin-top: 8px;
+    padding: 0;
+    border: 0;
+    color: var(--accent-text);
+    background: transparent;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.toggle:hover {
+    text-decoration: underline;
+}
+
+.toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
